@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
@@ -123,6 +124,18 @@ def validate_conversion(srt_data, gpx_file):
             srt_point["time"]) == time, "Mismatch in time."
 
 
+def set_file_modification_time(gpx_file, reference_file):
+    """
+    Sets the modification time of the GPX file to match the reference file.
+
+    Args:
+        gpx_file (str): Path to the GPX file.
+        reference_file (str): Path to the reference file (e.g., SRT file).
+    """
+    ref_stat = os.stat(reference_file)
+    os.utime(gpx_file, (ref_stat.st_atime, ref_stat.st_mtime))
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Convert SRT files with GPS data to GPX format."
@@ -132,6 +145,10 @@ def main():
     )
     parser.add_argument(
         "--output_dir", default=".", help="Directory to save the GPX files."
+    )
+    parser.add_argument(
+        "--match_modification_time", action="store_true",
+        help="Set the modification time of the GPX file to match the original SRT file."
     )
     args = parser.parse_args()
 
@@ -145,6 +162,10 @@ def main():
             )
             generate_gpx(srt_data, output_file)
             validate_conversion(srt_data, output_file)
+
+            if args.match_modification_time:
+                set_file_modification_time(output_file, srt_file)
+
             print(f"Successfully converted {srt_file} to {output_file}")
         except Exception as e:
             print(f"Error processing {srt_file}: {e}")

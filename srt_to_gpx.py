@@ -1,7 +1,8 @@
 import argparse
+import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
-import os
+
 
 def parse_srt(file_path):
     """
@@ -23,7 +24,8 @@ def parse_srt(file_path):
             location_data = lines[i + 2].strip()
             try:
                 lat, lon = map(float, location_data.split(",")[:2])
-                elevation = location_data.split(",")[2].strip().replace("m", "")
+                elevation = location_data.split(
+                    ",")[2].strip().replace("m", "")
                 entries.append({
                     "time": timestamp,
                     "lat": lat,
@@ -31,8 +33,10 @@ def parse_srt(file_path):
                     "elevation": float(elevation)
                 })
             except (ValueError, IndexError):
-                raise ValueError(f"Invalid location data in file {file_path}: {location_data}")
+                raise ValueError("Invalid location data in file "
+                                 f"{file_path}: {location_data}")
     return entries
+
 
 def convert_to_iso8601(date_str):
     """
@@ -49,6 +53,7 @@ def convert_to_iso8601(date_str):
         return parsed_time.strftime("%Y-%m-%dT%H:%M:%SZ")
     except ValueError:
         raise ValueError(f"Invalid time format: {date_str}")
+
 
 def generate_gpx(data, output_file):
     """
@@ -68,12 +73,14 @@ def generate_gpx(data, output_file):
     trkseg = ET.SubElement(trk, "trkseg")
 
     for entry in data:
-        trkpt = ET.SubElement(trkseg, "trkpt", lat=str(entry["lat"]), lon=str(entry["lon"]))
+        trkpt = ET.SubElement(trkseg, "trkpt", lat=str(
+            entry["lat"]), lon=str(entry["lon"]))
         ET.SubElement(trkpt, "ele").text = str(entry["elevation"])
         ET.SubElement(trkpt, "time").text = convert_to_iso8601(entry["time"])
 
     tree = ET.ElementTree(gpx)
     tree.write(output_file, encoding="utf-8", xml_declaration=True)
+
 
 def validate_conversion(srt_data, gpx_file):
     """
@@ -99,9 +106,12 @@ def validate_conversion(srt_data, gpx_file):
         ele = float(trkpt.find("ns:ele", namespace).text)
         time = trkpt.find("ns:time", namespace).text
 
-        assert (srt_point["lat"], srt_point["lon"]) == (lat, lon), "Mismatch in coordinates."
+        assert (srt_point["lat"], srt_point["lon"]) == (
+            lat, lon), "Mismatch in coordinates."
         assert srt_point["elevation"] == ele, "Mismatch in elevation."
-        assert convert_to_iso8601(srt_point["time"]) == time, "Mismatch in time."
+        assert convert_to_iso8601(
+            srt_point["time"]) == time, "Mismatch in time."
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -120,13 +130,15 @@ def main():
             print(f"Processing {srt_file}...")
             srt_data = parse_srt(srt_file)
             output_file = os.path.join(
-                args.output_dir, os.path.basename(srt_file).replace(".srt", ".gpx")
+                args.output_dir, os.path.basename(
+                    srt_file).replace(".srt", ".gpx")
             )
             generate_gpx(srt_data, output_file)
             validate_conversion(srt_data, output_file)
             print(f"Successfully converted {srt_file} to {output_file}")
         except Exception as e:
             print(f"Error processing {srt_file}: {e}")
+
 
 if __name__ == "__main__":
     main()

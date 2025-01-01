@@ -147,8 +147,9 @@ def main():
         "--output_dir", default=".", help="Directory to save the GPX files."
     )
     parser.add_argument(
-        "--match_modification_time", action="store_true",
-        help="Set the modification time of the GPX file to match the original SRT file."
+        "--no-match-time", action="store_true",
+        dest="no_match_time",
+        help="Do not set the GPX file's modification time to match the SRT file. By default, it is matched."
     )
     args = parser.parse_args()
 
@@ -163,7 +164,7 @@ def main():
             generate_gpx(srt_data, output_file)
             validate_conversion(srt_data, output_file)
 
-            if args.match_modification_time:
+            if not args.no_match_time:
                 set_file_modification_time(output_file, srt_file)
 
             print(f"Successfully converted {srt_file} to {output_file}")

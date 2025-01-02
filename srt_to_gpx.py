@@ -93,6 +93,7 @@ def generate_gpx(data, output_file):
         ET.SubElement(trkpt, "time").text = convert_to_iso8601(entry["time"])
 
     tree = ET.ElementTree(gpx)
+    ET.indent(tree)
     tree.write(output_file, encoding="utf-8", xml_declaration=True)
 
 

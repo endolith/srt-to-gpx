@@ -70,16 +70,16 @@ def generate_gpx(data, output_file):
     gpx = ET.Element(
         "gpx",
         version="1.1",
-        creator="SRTtoGPX",
+        creator="srt-to-gpx",
         xmlns="http://www.topografix.com/GPX/1/1",
     )
 
     # Add metadata
     metadata = ET.SubElement(gpx, "metadata")
-    ET.SubElement(metadata, "name").text = "SRT to GPX Converter"
-    ET.SubElement(
-        metadata, "desc").text = "Converted using OpenCamera SRT to GPX Script"
-    ET.SubElement(metadata, "author").text = "OpenCamera Script"
+    ET.SubElement(metadata, "name").text = "OpenCamera SRT to GPX conversion"
+    ET.SubElement(metadata, "desc").text = ("Converted from OpenCamera SRT file using srt-to-gpx\n"
+                                            "https://github.com/endolith/srt-to-gpx")
+    ET.SubElement(metadata, "author").text = "srt-to-gpx"
     ET.SubElement(metadata, "time").text = datetime.utcnow().strftime(
         "%Y-%m-%dT%H:%M:%SZ")
 

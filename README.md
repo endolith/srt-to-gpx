@@ -67,12 +67,14 @@ Jul 4, 2024 6:13:18 PM
 Generated .gpx file:
 
 ```xml
-<gpx version="1.1" creator="SRTtoGPX" xmlns="http://www.topografix.com/GPX/1/1">
+<?xml version='1.0' encoding='utf-8'?>
+<gpx version="1.1" creator="srt-to-gpx" xmlns="http://www.topografix.com/GPX/1/1">
   <metadata>
-    <name>SRT to GPX Converter</name>
-    <desc>Converted using OpenCamera SRT to GPX Script</desc>
-    <author>OpenCamera Script</author>
-    <time>2025-01-01T12:00:00Z</time>
+    <name>OpenCamera SRT to GPX conversion</name>
+    <desc>Converted from OpenCamera SRT file using srt-to-gpx
+https://github.com/endolith/srt-to-gpx</desc>
+    <author>srt-to-gpx</author>
+    <time>2025-01-02T01:19:20Z</time>
   </metadata>
   <trk>
     <trkseg>

@@ -13,30 +13,33 @@ def parse_srt(file_path):
         file_path (str): Path to the SRT file.
 
     Returns:
-        list of dict: Extracted data with keys `time`, `lat`, `lon`, and `elevation`.
+        tuple: A list of valid entries (dict) and a count of skipped invalid entries.
     """
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
     entries = []
+    skipped = 0
     for i in range(len(lines)):
         if '-->' in lines[i]:
             timestamp = lines[i + 1].strip()
             location_data = lines[i + 2].strip()
             try:
-                lat, lon = map(float, location_data.split(",")[:2])
-                elevation = location_data.split(
-                    ",")[2].strip().replace("m", "")
-                entries.append({
-                    "time": timestamp,
-                    "lat": lat,
-                    "lon": lon,
-                    "elevation": float(elevation)
-                })
+                if ',' in location_data:
+                    lat, lon = map(float, location_data.split(",")[:2])
+                    elevation = location_data.split(
+                        ",")[2].strip().replace("m", "")
+                    entries.append({
+                        "time": timestamp,
+                        "lat": lat,
+                        "lon": lon,
+                        "elevation": float(elevation)
+                    })
+                else:
+                    skipped += 1  # Skip compass heading-only entries
             except (ValueError, IndexError):
-                raise ValueError("Invalid location data in file "
-                                 f"{file_path}: {location_data}")
-    return entries
+                skipped += 1
+    return entries, skipped
 
 
 def convert_to_iso8601(date_str):
@@ -156,7 +159,13 @@ def main():
     for srt_file in args.input_files:
         try:
             print(f"Processing {srt_file}...")
-            srt_data = parse_srt(srt_file)
+            srt_data, skipped = parse_srt(srt_file)
+
+            if not srt_data:
+                print(f"No GPS data found in file: {srt_file}. Only compass "
+                      "headings or invalid entries were present.")
+                continue
+
             output_file = os.path.join(
                 args.output_dir, os.path.basename(
                     srt_file).replace(".srt", ".gpx")
@@ -168,6 +177,7 @@ def main():
                 set_file_modification_time(output_file, srt_file)
 
             print(f"Successfully converted {srt_file} to {output_file}")
+            print(f"Skipped {skipped} invalid or non-GPS entries.")
         except Exception as e:
             print(f"Error processing {srt_file}: {e}")
 

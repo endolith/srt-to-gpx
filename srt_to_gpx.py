@@ -158,7 +158,7 @@ def main():
 
     for srt_file in args.input_files:
         try:
-            print(f"Processing {srt_file}...")
+            print(f"\nProcessing {srt_file}...")
             srt_data, skipped = parse_srt(srt_file)
 
             if not srt_data:
